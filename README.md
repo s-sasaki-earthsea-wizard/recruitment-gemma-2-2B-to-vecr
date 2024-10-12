@@ -118,11 +118,40 @@ $$ 2^{10} = 1024 \ \text{count}$$
 コマンドの実行が完了したら、以下のコマンドで新しく作成されたswapfileとそのサイズが表示されます:
 ```bash
 $ ls -lh /media/usb/swapfile
-TBA
+-rw-r--r-- 1 root root 16G ${Month} ${Day} ${Hour}:${min} /media/usb/swapfile
 ```
 
-1. hoge
+4. スワップファイルの有効化
+スワップファイルのパーミッションを変更する(必要であれば)
+: 
+```bash
+sudo chmod 600 /media/usb/swapfile
+```
 
+スワップファイルを初期化: 
+```bash
+sudo mkswap /media/usb/swapfile
+```
+
+スワップファイルを有効化：
+```bash
+sudo swapon /media/usb/swapfile
+```
+
+スワップ領域の確認：
+```bash
+$ sudo swapon --show
+/media/usb/swapfile file         16G   0B   -1
+```
+
+```bash
+$ free -h
+              total        used        free      shared  buff/cache   available
+Mem:           ***
+Swap:           17G         30M         17G
+```
+
+note: GiBとGBの混同はよくあることですが気をつけましょう
 
 
 # recruitment-gemma-2-2B-to-VECR
