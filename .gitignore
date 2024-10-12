@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# virtualenv
+venv/
+env/
+ENV/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# log files
+*.log
+
+# database files
+*.sqlite3
+*.db
+
+# Environment variables (for security)
+.env
+
+# Docker
+.dockerignore
+
+# Model files
+/app/model/
+!app/model/.gitkeep
+
+# Cache directory
+.cache/
+
+# Compiled files
+*.bak
+*.tmp
+*.temp
