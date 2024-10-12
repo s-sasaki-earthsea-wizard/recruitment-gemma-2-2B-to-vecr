@@ -1,0 +1,19 @@
+# name: Check for Sensitive Information
+
+# on: [push, pull_request]
+
+# jobs:
+#   check_sensitive_info:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Check for sensitive information
+#       run: |
+#         if [[ "${{ github.event.head_commit.message }}" == *"[skip ci]"* ]]; then
+#           echo "Skipping CI due to commit message"
+#           exit 0
+#         fi
+#         if grep -r -E "(password|secret|api[_-]?key|token)" .; then
+#           echo "Potential sensitive information found"
+#           exit 1
+#         fi
