@@ -49,8 +49,9 @@ Thumbs.db
 # Docker
 .dockerignore
 
-# Model files (example)
-*.h5  
+# Model files
+/app/model/
+!app/model/.gitkeep
 
 # Cache directory
 .cache/

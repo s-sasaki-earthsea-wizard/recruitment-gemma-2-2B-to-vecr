@@ -1,9 +1,17 @@
 # Import and set environment variables
 include .env
 COMPOSE = docker compose
-IMAGE_NAME = ${TEAM_MEMBER_NAME}_image
-CONTAINER_NAME = ${TEAM_MEMBER_NAME}_container
 
+# Convert TEAM_MEMBER_NAME to lowercase for Docker image naming, and export it
+TEAM_MEMBER_NAME_LOWER := $(shell echo $(TEAM_MEMBER_NAME) | tr '[:upper:]' '[:lower:]')
+export TEAM_MEMBER_NAME_LOWER
+
+# Set the image and container names
+IMAGE_NAME = $(TEAM_MEMBER_NAME_LOWER)_image
+CONTAINER_NAME = $(TEAM_MEMBER_NAME_LOWER)_container
+
+
+# Define phony targets
 .Phony: help docker-build docker-run docker-stop docker-clean logs shell summary
 
 # Make 'help' the default target
@@ -26,7 +34,7 @@ docker-stop:
 	$(COMPOSE) down
 
 # Stop all containers and remove all images
-docker-clean: stop 
+docker-clean: docker-stop 
 	docker rmi $(IMAGE_NAME)
 
 # Show container logs
