@@ -2,14 +2,17 @@
 include .env
 COMPOSE = docker compose
 
-# Convert TEAM_MEMBER_NAME to lowercase for Docker image naming, and export it
+# Convert TEAM_MEMBER_NAME and PROJECT_NAME to lowercase for Docker image naming
 TEAM_MEMBER_NAME_LOWER := $(shell echo $(TEAM_MEMBER_NAME) | tr '[:upper:]' '[:lower:]')
+PROJECT_NAME_LOWER := $(shell echo $(PROJECT_NAME) | tr '[:upper:]' '[:lower:]')
+
+# Export the lower names
 export TEAM_MEMBER_NAME_LOWER
+export PROJECT_NAME_LOWER
 
 # Set the image and container names
-IMAGE_NAME = $(TEAM_MEMBER_NAME_LOWER)_image
-CONTAINER_NAME = $(TEAM_MEMBER_NAME_LOWER)_container
-
+IMAGE_NAME = $(TEAM_MEMBER_NAME_LOWER)-image-$(PROJECT_NAME_LOWER)
+CONTAINER_NAME = $(TEAM_MEMBER_NAME_LOWER)-container-$(PROJECT_NAME_LOWER)
 
 # Define phony targets
 .Phony: help docker-build docker-run docker-stop docker-clean logs shell summary
@@ -36,6 +39,7 @@ docker-stop:
 # Stop all containers and remove all images
 docker-clean: docker-stop 
 	docker rmi $(IMAGE_NAME)
+	@echo "To remove all related images, use: docker image prune -a"
 
 # Show container logs
 logs: 
@@ -56,7 +60,7 @@ summary:
 # ------------------------------------------------------------------------------
 help:
 	@echo "══════════════════════════════════════════════════════════════════"
-	@echo "            Welcome to out team, ${TEAM_MEMBER_NAME}!             "
+	@echo "     Welcome to $(PROJECT_NAME) team, ${TEAM_MEMBER_NAME}!        "
 	@echo "══════════════════════════════════════════════════════════════════"
 	@echo ""
 	@echo "Here are the available commands to interact with ${TEAM_MEMBER_NAME}:"

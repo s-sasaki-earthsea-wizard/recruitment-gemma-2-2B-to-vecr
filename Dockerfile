@@ -16,17 +16,26 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Hugging Face CLI のインストール; Install Hugging Face CLI
 RUN pip install --no-cache-dir huggingface_hub
 
+# 環境変数の設定; Set environment variables
+ARG PROJECT_NAME
+ARG TEAM_MEMBER_NAME
+ARG HF_TOKEN
+
+ENV PROJECT_NAME=$PROJECT_NAME
+ENV TEAM_MEMBER_NAME=$TEAM_MEMBER_NAME
+ENV HUGGINGFACE_TOKEN=$HF_TOKEN
+ARG MODEL_NAME
+ENV MODEL_NAME=$MODEL_NAME
+ARG MODEL_PATH
+ENV MODEL_PATH=$MODEL_PATH
+
 # モデルのダウンロード; Download the model
-# ARG HF_TOKEN
-# RUN huggingface-cli login --token $HF_TOKEN \
-#     && huggingface-cli download google/gemma-2-2b-it --local-dir /app/model --local-dir-use-symlinks False \
-#     && huggingface-cli logout
+RUN huggingface-cli login --token $HUGGINGFACE_TOKEN \
+    && huggingface-cli download $MODEL_NAME --local-dir $MODEL_PATH --local-dir-use-symlinks False \
+    && huggingface-cli logout
 
 # アプリケーションコードをコンテナにコピー; Copy the application code
 COPY . .
-
-# 環境変数の設定; Set environment variables
-# ENV MODEL_PATH=/app/model
 
 # コンテナ起動時のコマンドを指定; Specify the command to run on container start
 CMD ["python", "app.py"]
