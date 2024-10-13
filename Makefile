@@ -6,16 +6,19 @@ COMPOSE = docker compose
 TEAM_MEMBER_NAME_LOWER := $(shell echo $(TEAM_MEMBER_NAME) | tr '[:upper:]' '[:lower:]')
 PROJECT_NAME_LOWER := $(shell echo $(PROJECT_NAME) | tr '[:upper:]' '[:lower:]')
 
-# Export the lower names
-export TEAM_MEMBER_NAME_LOWER
-export PROJECT_NAME_LOWER
+# Generate Docker image and container names
+DOCKER_IMAGE_NAME := $(TEAM_MEMBER_NAME_LOWER)-image-$(PROJECT_NAME_LOWER)
+DOCKER_CONTAINER_NAME := $(TEAM_MEMBER_NAME_LOWER)-container-$(PROJECT_NAME_LOWER)
+
+# Export all variables
+export
 
 # Set the image and container names
 IMAGE_NAME = $(TEAM_MEMBER_NAME_LOWER)-image-$(PROJECT_NAME_LOWER)
 CONTAINER_NAME = $(TEAM_MEMBER_NAME_LOWER)-container-$(PROJECT_NAME_LOWER)
 
 # Define phony targets
-.Phony: help docker-build docker-run docker-stop docker-clean logs shell summary
+.Phony: help docker-build docker-run docker-stop docker-clean docker-logs docker-shell summary
 
 # Make 'help' the default target
 .DEFAULT_GOAL := help
@@ -29,7 +32,7 @@ docker-build:
 	$(COMPOSE) build
 
 ## Run the docker container
-docker-run: 
+docker-up: 
 	$(COMPOSE) up -d
 
 ## Stop the docker container
@@ -42,11 +45,11 @@ docker-clean: docker-stop
 	@echo "To remove all related images, use: docker image prune -a"
 
 # Show container logs
-logs: 
+docker-logs: 
 	$(COMPOSE) logs -f
 
 # Start a shell in the container
-shell: 
+docker-shell: 
 	docker exec -it $(CONTAINER_NAME) /bin/bash
 
 # ------------------------------------------------------------------------------
@@ -66,11 +69,11 @@ help:
 	@echo "Here are the available commands to interact with ${TEAM_MEMBER_NAME}:"
 	@echo "Make [Targets]:"
 	@echo "  docker-build     Build the docker image"
-	@echo "  docker-run       Run the docker container"
+	@echo "  docker-up        Run the docker container"
 	@echo "  docker-stop      Stop the docker container"
 	@echo "  docker-clean     Stop all containers and remove all images"
-	@echo "  logs             Show container logs"
-	@echo "  shell            Start a shell in the container"
+	@echo "  docker-logs      Show container logs"
+	@echo "  docker-shell     Start a shell in the container"
 	@echo "  summary          Generate project summary"
 	@echo "  help             Show this help message"
 	@echo ""

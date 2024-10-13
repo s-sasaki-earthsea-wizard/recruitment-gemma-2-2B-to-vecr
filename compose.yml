@@ -2,8 +2,8 @@ version: '3.9'
 
 services:
   text_generation_app:
-    image: ${TEAM_MEMBER_NAME_LOWER}_image_${PROJECT_NAME_LOWER}
-    container_name: ${TEAM_MEMBER_NAME_LOWER}_container_${PROJECT_NAME_LOWER}
+    image: ${DOCKER_IMAGE_NAME}
+    container_name: ${DOCKER_CONTAINER_NAME}
     build:
       context: .
       args:
@@ -21,3 +21,5 @@ services:
       - MODEL_NAME=${MODEL_NAME}
     volumes:
       - ./app:/app
+    tty: true
+    stdin_open: true

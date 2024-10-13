@@ -1,5 +1,5 @@
-# オリジナル版の作者に敬意を表し、コメントを日英併記しています。
-# In respect to the original author, comments are written in both Japanese and English.
+# オリジナル版の作者に敬意を表し、日本語のコメントを残し、佐々木が英文コメントでの補足を行っています。
+# In honour of the author of the original version, I have left comments in Japanese and Sasaki has supplemented them with English comments.
 
 # ベースイメージの指定; Set the base image
 FROM python:3.12
@@ -20,22 +20,17 @@ RUN pip install --no-cache-dir huggingface_hub
 ARG PROJECT_NAME
 ARG TEAM_MEMBER_NAME
 ARG HF_TOKEN
+ARG MODEL_NAME
+ARG MODEL_PATH
 
 ENV PROJECT_NAME=$PROJECT_NAME
 ENV TEAM_MEMBER_NAME=$TEAM_MEMBER_NAME
 ENV HUGGINGFACE_TOKEN=$HF_TOKEN
-ARG MODEL_NAME
 ENV MODEL_NAME=$MODEL_NAME
-ARG MODEL_PATH
 ENV MODEL_PATH=$MODEL_PATH
-
-# モデルのダウンロード; Download the model
-RUN huggingface-cli login --token $HUGGINGFACE_TOKEN \
-    && huggingface-cli download $MODEL_NAME --local-dir $MODEL_PATH --local-dir-use-symlinks False \
-    && huggingface-cli logout
 
 # アプリケーションコードをコンテナにコピー; Copy the application code
 COPY . .
 
 # コンテナ起動時のコマンドを指定; Specify the command to run on container start
-CMD ["python", "app.py"]
+CMD ["/bin/bash"]
