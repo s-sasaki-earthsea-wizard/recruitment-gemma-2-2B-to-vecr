@@ -36,7 +36,7 @@ docker-up:
 	$(COMPOSE) up -d
 
 ## Stop the docker container
-docker-stop: 
+docker-down: 
 	$(COMPOSE) down
 
 # Stop all containers and remove all images
@@ -51,6 +51,9 @@ docker-logs:
 # Start a shell in the container
 docker-shell: 
 	docker exec -it $(CONTAINER_NAME) /bin/bash
+
+# Run the docker container and start a shell
+docker-run: docker-up docker-shell
 
 # ------------------------------------------------------------------------------
 # Generate project summary
@@ -70,10 +73,11 @@ help:
 	@echo "Make [Targets]:"
 	@echo "  docker-build     Build the docker image"
 	@echo "  docker-up        Run the docker container"
-	@echo "  docker-stop      Stop the docker container"
+	@echo "  docker-down      Stop the docker container"
 	@echo "  docker-clean     Stop all containers and remove all images"
 	@echo "  docker-logs      Show container logs"
 	@echo "  docker-shell     Start a shell in the container"
+	@echo "  docker-run       Run the docker container and start a shell"
 	@echo "  summary          Generate project summary"
 	@echo "  help             Show this help message"
 	@echo ""
