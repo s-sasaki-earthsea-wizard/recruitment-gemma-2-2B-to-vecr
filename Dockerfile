@@ -1,5 +1,5 @@
-# オリジナル版の作者に敬意を表し、コメントを日英併記しています。
-# In respect to the original author, comments are written in both Japanese and English.
+# オリジナル版の作者に敬意を表し、日本語のコメントを残し、佐々木が英文コメントでの補足を行っています。
+# In honour of the author of the original version, I have left comments in Japanese and Sasaki has supplemented them with English comments.
 
 # ベースイメージの指定; Set the base image
 FROM python:3.12
@@ -16,17 +16,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Hugging Face CLI のインストール; Install Hugging Face CLI
 RUN pip install --no-cache-dir huggingface_hub
 
-# モデルのダウンロード; Download the model
-# ARG HF_TOKEN
-# RUN huggingface-cli login --token $HF_TOKEN \
-#     && huggingface-cli download google/gemma-2-2b-it --local-dir /app/model --local-dir-use-symlinks False \
-#     && huggingface-cli logout
+# 環境変数の設定; Set environment variables
+ARG PROJECT_NAME
+ARG TEAM_MEMBER_NAME
+ARG HF_TOKEN
+ARG MODEL_NAME
+ARG MODEL_PATH
+
+ENV PROJECT_NAME=$PROJECT_NAME
+ENV TEAM_MEMBER_NAME=$TEAM_MEMBER_NAME
+ENV HF_TOKEN=$HF_TOKEN
+ENV MODEL_NAME=$MODEL_NAME
+ENV MODEL_PATH=$MODEL_PATH
 
 # アプリケーションコードをコンテナにコピー; Copy the application code
 COPY . .
 
-# 環境変数の設定; Set environment variables
-# ENV MODEL_PATH=/app/model
-
 # コンテナ起動時のコマンドを指定; Specify the command to run on container start
-CMD ["python", "app.py"]
+CMD ["/bin/bash"]

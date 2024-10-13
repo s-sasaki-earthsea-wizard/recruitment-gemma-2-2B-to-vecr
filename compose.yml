@@ -2,13 +2,34 @@ version: '3.9'
 
 services:
   text_generation_app:
-    image: ${TEAM_MEMBER_NAME_LOWER}_image
-    container_name: ${TEAM_MEMBER_NAME_LOWER}_container
+    image: ${DOCKER_IMAGE_NAME}
+    container_name: ${DOCKER_CONTAINER_NAME}
     build:
       context: .
       args:
+        - PROJECT_NAME=${PROJECT_NAME}
+        - TEAM_MEMBER_NAME=${TEAM_MEMBER_NAME}
         - HF_TOKEN=${HF_TOKEN}
+        - MODEL_NAME=${MODEL_NAME}
+        - MODEL_PATH=${MODEL_PATH}
     ports:
       - "8080:8080"
     environment:
-      - MODEL_PATH=/app/model
+      - MODEL_PATH=${MODEL_PATH}
+      - PROJECT_NAME=${PROJECT_NAME}
+      - TEAM_MEMBER_NAME=${TEAM_MEMBER_NAME}
+      - MODEL_NAME=${MODEL_NAME}
+    volumes:
+      - ./app:/app
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        limits:
+          memory: 12g  # 12GB of memory
+        reservations:
+          memory: 2g   # 2GB of memory
+
+# TODO: Consider adding GPU support for Jetson Nano in the future
+# - Add NVIDIA Container Toolkit support
+# - Include GPU-related environment variables and device reservations

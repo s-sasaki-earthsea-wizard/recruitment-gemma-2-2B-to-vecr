@@ -1,18 +1,24 @@
+# Define phony targets
+.Phony: help docker-build docker-run docker-stop docker-clean docker-logs docker-shell summary
+
 # Import and set environment variables
 include .env
 COMPOSE = docker compose
 
-# Convert TEAM_MEMBER_NAME to lowercase for Docker image naming, and export it
+# Convert TEAM_MEMBER_NAME and PROJECT_NAME to lowercase for Docker image naming
 TEAM_MEMBER_NAME_LOWER := $(shell echo $(TEAM_MEMBER_NAME) | tr '[:upper:]' '[:lower:]')
-export TEAM_MEMBER_NAME_LOWER
+PROJECT_NAME_LOWER := $(shell echo $(PROJECT_NAME) | tr '[:upper:]' '[:lower:]')
+
+# Generate Docker image and container names
+DOCKER_IMAGE_NAME := $(TEAM_MEMBER_NAME_LOWER)-image-$(PROJECT_NAME_LOWER)
+DOCKER_CONTAINER_NAME := $(TEAM_MEMBER_NAME_LOWER)-container-$(PROJECT_NAME_LOWER)
+
+# Export all variables
+export
 
 # Set the image and container names
-IMAGE_NAME = $(TEAM_MEMBER_NAME_LOWER)_image
-CONTAINER_NAME = $(TEAM_MEMBER_NAME_LOWER)_container
-
-
-# Define phony targets
-.Phony: help docker-build docker-run docker-stop docker-clean logs shell summary
+IMAGE_NAME = $(TEAM_MEMBER_NAME_LOWER)-image-$(PROJECT_NAME_LOWER)
+CONTAINER_NAME = $(TEAM_MEMBER_NAME_LOWER)-container-$(PROJECT_NAME_LOWER)
 
 # Make 'help' the default target
 .DEFAULT_GOAL := help
@@ -26,24 +32,28 @@ docker-build:
 	$(COMPOSE) build
 
 ## Run the docker container
-docker-run: 
+docker-up: 
 	$(COMPOSE) up -d
 
 ## Stop the docker container
-docker-stop: 
+docker-down: 
 	$(COMPOSE) down
 
 # Stop all containers and remove all images
 docker-clean: docker-stop 
 	docker rmi $(IMAGE_NAME)
+	@echo "To remove all related images, use: docker image prune -a"
 
 # Show container logs
-logs: 
+docker-logs: 
 	$(COMPOSE) logs -f
 
 # Start a shell in the container
-shell: 
+docker-shell: 
 	docker exec -it $(CONTAINER_NAME) /bin/bash
+
+# Run the docker container and start a shell
+docker-run: docker-up docker-shell
 
 # ------------------------------------------------------------------------------
 # Generate project summary
@@ -56,17 +66,18 @@ summary:
 # ------------------------------------------------------------------------------
 help:
 	@echo "══════════════════════════════════════════════════════════════════"
-	@echo "            Welcome to out team, ${TEAM_MEMBER_NAME}!             "
+	@echo "     Welcome to $(PROJECT_NAME) team, ${TEAM_MEMBER_NAME}!        "
 	@echo "══════════════════════════════════════════════════════════════════"
 	@echo ""
 	@echo "Here are the available commands to interact with ${TEAM_MEMBER_NAME}:"
 	@echo "Make [Targets]:"
 	@echo "  docker-build     Build the docker image"
-	@echo "  docker-run       Run the docker container"
-	@echo "  docker-stop      Stop the docker container"
+	@echo "  docker-up        Run the docker container"
+	@echo "  docker-down      Stop the docker container"
 	@echo "  docker-clean     Stop all containers and remove all images"
-	@echo "  logs             Show container logs"
-	@echo "  shell            Start a shell in the container"
+	@echo "  docker-logs      Show container logs"
+	@echo "  docker-shell     Start a shell in the container"
+	@echo "  docker-run       Run the docker container and start a shell"
 	@echo "  summary          Generate project summary"
 	@echo "  help             Show this help message"
 	@echo ""

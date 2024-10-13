@@ -47,6 +47,9 @@ Gemma 2 2Bは、Google LLCが提供する機械学習モデルの一部です。
 - and so on (TBA)
 
 ### USBメモリをスワップとして設定する方法
+- **(閲覧注意！)禁じられた「破滅の呪文」が数多く登場します**  
+- **必ずバックアップを取ってから作業をしてください！**
+
 1. USBメモリを接続し、デバイス名を確認する
 ```
 $ lsusb
@@ -64,7 +67,8 @@ sda            8:0    1  28.7G  0 disk
 以下で紹介するコマンドのデバイスの部分は各自の環境に合わせたものを利用してください。
 
 1. USBメモリ全体を`ext4`でフォーマットする (必要な場合)
-以下のコマンドでUSBメモリ全体をext4でフォーマットします
+以下のコマンドでUSBメモリ全体をext4でフォーマットします:  
+**(心臓の弱い人は注意！)危険なコマンドなので十分注意して打ちましょう**
 ```bash
 sudo mkfs.ext4 /dev/sda
 ```
@@ -97,7 +101,8 @@ $ mount | grep /media/usb
 ```
 
 3. スワップファイルを作成する
-以下のコマンドでスワップファイルを作成します: 
+以下のコマンドでスワップファイルを作成します:  
+**危険なコマンドなので十分注意してから使用すること！**
 ```
 sudo dd if=/dev/zero of=/media/usb/swapfile bs=1M count=16384
 ```
@@ -153,6 +158,32 @@ Swap:           17G         30M         17G
 
 note: GiBとGBの混同はよくあることですが気をつけましょう
 
+### 再起動後もUSBメモリのスワップを有効にする手順
+1. UUIDの確認 
+USBメモリのUUIDを確認するために、以下のコマンドを実行：
+```bash
+sudo blkid /dev/sda
+```
+
+結果として以下のような出力が得られるはず：
+```bash
+/dev/sda1: UUID="xxxx-xxxx-xxxx-xxxx" TYPE="ext4"
+```
+次の作業で使うため、このUUIDを控えておく。
+
+### `/etc/fstabに設定を追加 
+再起動後もスワップが自動で有効になるように、
+```bash
+sudo nano /etc/fstab
+```
+で(あるいは`vi`で)
+`/etc/fstab` ファイルに以下の行を追加：
+```bash
+UUID=xxxxxxxxxx /media/usb ext4 defaults 0 0
+/media/usb/swapfile none swap sw 0 0
+```
+
+これで再起動後にもUUIDを使ってUSBメモリが正しくマウントされ、スワップファイルが有効になります。
 
 # recruitment-gemma-2-2B-to-VECR
 This is a section of the original [`README`](https://github.com/takoyaki-3/docker-gemma-2-2b-jpn-it/blob/main/README.md) that Sasaki has modified.
