@@ -1,3 +1,6 @@
+# Define phony targets
+.Phony: help docker-build docker-run docker-stop docker-clean docker-logs docker-shell summary
+
 # Import and set environment variables
 include .env
 COMPOSE = docker compose
@@ -16,9 +19,6 @@ export
 # Set the image and container names
 IMAGE_NAME = $(TEAM_MEMBER_NAME_LOWER)-image-$(PROJECT_NAME_LOWER)
 CONTAINER_NAME = $(TEAM_MEMBER_NAME_LOWER)-container-$(PROJECT_NAME_LOWER)
-
-# Define phony targets
-.Phony: help docker-build docker-run docker-stop docker-clean docker-logs docker-shell summary
 
 # Make 'help' the default target
 .DEFAULT_GOAL := help

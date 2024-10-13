@@ -23,3 +23,13 @@ services:
       - ./app:/app
     tty: true
     stdin_open: true
+    deploy:
+      resources:
+        limits:
+          memory: 12g  # 12GB of memory
+        reservations:
+          memory: 2g   # 2GB of memory
+
+# TODO: Consider adding GPU support for Jetson Nano in the future
+# - Add NVIDIA Container Toolkit support
+# - Include GPU-related environment variables and device reservations
