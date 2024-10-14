@@ -39,10 +39,20 @@ docker-up:
 docker-down: 
 	$(COMPOSE) down
 
-# Stop all containers and remove all images
-docker-clean: docker-stop 
+# Stop all containers and remove all images including child images
+docker-clean: docker-down
+	@if [ -n "$$(docker images --filter "since=$(IMAGE_NAME)" --quiet)" ]; then \
+		echo "Removing child images..."; \
+		docker rmi $$(docker images --filter "since=$(IMAGE_NAME)" --quiet); \
+	else \
+		echo "No child images found."; \
+	fi
 	docker rmi $(IMAGE_NAME)
 	@echo "To remove all related images, use: docker image prune -a"
+
+# Commit the changes to the docker image
+docker-commit:
+	echo "Committing changes to the docker image..."
 
 # Show container logs
 docker-logs: 

@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   text_generation_app:
-    image: ${DOCKER_IMAGE_NAME}
+    image: ${DOCKER_IMAGE_NAME}:latest
     container_name: ${DOCKER_CONTAINER_NAME}
     build:
       context: .
@@ -23,12 +23,8 @@ services:
       - ./app:/app
     tty: true
     stdin_open: true
-    deploy:
-      resources:
-        limits:
-          memory: 12g  # 12GB of memory
-        reservations:
-          memory: 2g   # 2GB of memory
+    mem_limit: 1g   # memory limit directly set here
+    mem_reservation: 0.5g   # memory reservation
 
 # TODO: Consider adding GPU support for Jetson Nano in the future
 # - Add NVIDIA Container Toolkit support
