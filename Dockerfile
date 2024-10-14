@@ -32,5 +32,17 @@ ENV MODEL_PATH=$MODEL_PATH
 # アプリケーションコードをコンテナにコピー; Copy the application code
 COPY . .
 
+# Create the model path directory
+RUN mkdir -p $MODEL_PATH
+
+# Download the model
+RUN python app/download_model.py
+
+# Remove the download script
+RUN rm app/download_model.py
+
+# Remove the HF token from the environment variables
+ENV HF_TOKEN=
+
 # コンテナ起動時のコマンドを指定; Specify the command to run on container start
 CMD ["/bin/bash"]

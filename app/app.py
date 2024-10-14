@@ -3,45 +3,52 @@ from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os
+import psutil
+import time
 
-# オリジナル版の作者に敬意を表し、日本語のコメントを残し、佐々木が英文コメントでの補足を行っています。
-# In honour of the author of the original version, 
-# I have left comments in Japanese and Sasaki has supplemented them with English comments.
+# Define global variables
+model = None
+tokenizer = None
+pipe = None
 
-# Get the model name and model path from the environment variables
-model_name = os.getenv('MODEL_NAME')
-model_path = os.getenv('MODEL_PATH')
-model_name = os.getenv('MODEL_NAME', 'google/gemma-2-2b-jpn-it')  # Set the default model name
+def load_model():
+    global model, tokenizer, pipe
+    model_name = os.getenv('MODEL_NAME', 'google/gemma-2-2b-jpn-it')
+    model_path = os.getenv('MODEL_PATH', './model')
 
-# Load the model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-model = AutoModelForCausalLM.from_pretrained(
-    model_path,
-    device_map="auto",
-    torch_dtype=torch.bfloat16
-)
+    start_time = time.time()
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_path,
+        device_map="auto",
+        torch_dtype=torch.float16  # Load model in FP16
+    )
+    load_time = time.time() - start_time
+    print(f"Model Load Time: {load_time:.2f} seconds")
 
-# パイプラインの準備 (CPUを使用するように設定)
-# Prepare the pipeline (set to use CPU)
-pipe = pipeline(
-    "text-generation",
-    model=model_name,
-    device=-1  # CPUを使用; use CPU
-)
+    pipe = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        device="cuda" if torch.cuda.is_available() else "cpu"
+    )
 
-# Flaskアプリケーションの設定
-# Flask application settings
+    # Show memory usage
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    print(f"Memory Usage: {memory_info.rss / (1024 * 1024):.2f} MB")
+
 app = Flask(__name__)
-CORS(app)  # CORSを有効にしてクロスオリジンアクセスを許可; Enable CORS to allow cross-origin access
+CORS(app)
 
-# HTMLの提供用のルートエンドポイント
-# Root endpoint for serving HTML
+@app.before_first_request
+def initialize():
+    load_model()
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# 対話APIエンドポイント
-# Chat API endpoint
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
@@ -49,12 +56,21 @@ def chat():
         if not user_message:
             return jsonify({"error": "Message is required"}), 400
 
-        # 推論の実行; Perform inference
+        start_time = time.time()
         messages = [{"role": "user", "content": user_message}]
         outputs = pipe(messages, return_full_text=False, max_new_tokens=256)
         assistant_response = outputs[0]["generated_text"].strip()
+        inference_time = time.time() - start_time
 
-        return jsonify({"response": assistant_response})
+        # Check memory usage after inference
+        process = psutil.Process(os.getpid())
+        memory_info = process.memory_info()
+        print(f"Memory Usage after inference: {memory_info.rss / (1024 * 1024):.2f} MB")
+
+        return jsonify({
+            "response": assistant_response,
+            "inference_time": f"{inference_time:.2f}秒"
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
